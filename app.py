@@ -191,8 +191,6 @@ elif page == "▶️  YouTube Leads":
             with st.spinner("Searching YouTube..."):
                 import requests
                 import os
-                from dotenv import load_dotenv
-                load_dotenv()
                 
                 api_key = os.getenv("YOUTUBE_API_KEY")
                 url = "https://www.googleapis.com/youtube/v3/search"
