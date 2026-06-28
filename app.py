@@ -173,9 +173,26 @@ elif page == "▶️  YouTube Leads":
                             desc = snippet.get("description", "")
                             emails = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', desc)
                             channel_id = ch.get("id", {}).get("channelId", "")
+                            
+                            email_found = "Not found"
+                            if emails:
+                                email_found = emails[0]
+                            else:
+                                try:
+                                    about_url = f"https://www.youtube.com/channel/{channel_id}/about"
+                                    headers_yt = {"User-Agent": "Mozilla/5.0"}
+                                    about_response = requests.get(about_url, headers=headers_yt, timeout=5)
+                                    if about_response.status_code == 200:
+                                        page_emails = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', about_response.text)
+                                        clean_emails = [e for e in page_emails if not any(x in e for x in ['youtube', 'google', 'goog', 'yt'])]
+                                        if clean_emails:
+                                            email_found = clean_emails[0]
+                                except:
+                                    pass
+                            
                             results.append({
                                 "Channel": snippet.get("channelTitle", ""),
-                                "Email": emails[0] if emails else "Not found",
+                                "Email": email_found,
                                 "Description": desc[:80] + "..." if len(desc) > 80 else desc,
                                 "YouTube Link": f"https://youtube.com/channel/{channel_id}"
                             })
@@ -188,7 +205,6 @@ elif page == "▶️  YouTube Leads":
                     st.error(f"Error: {response.status_code}")
         else:
             st.warning("Please enter a keyword!")
-
 elif page == "📧  Email Finder":
     st.markdown("<h2 style='color:#e6edf3;'>📧 Email Finder</h2>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
