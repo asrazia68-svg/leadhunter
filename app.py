@@ -199,9 +199,47 @@ elif page == "📧  Email Finder":
         company = st.text_input("Company Name", placeholder="e.g. Google")
         domain = st.text_input("Domain", placeholder="e.g. google.com")
     if st.button("🔍 Find Email"):
-        if first_name and company:
+        if first_name and domain:
             with st.spinner("Finding email..."):
-                st.success("Email found!")
-                st.info(f"📧 {first_name.lower()}.{last_name.lower()}@{domain if domain else company.lower()+'.com'}")
+                client_id = os.getenv("SNOV_CLIENT_ID")
+                client_secret = os.getenv("SNOV_CLIENT_SECRET")
+                
+                # Get access token
+                token_response = requests.post(
+                    "https://api.snov.io/v1/oauth/access_token",
+                    data={
+                        "grant_type": "client_credentials",
+                        "client_id": client_id,
+                        "client_secret": client_secret
+                    }
+                )
+                
+                if token_response.status_code == 200:
+                    token = token_response.json().get("access_token")
+                    
+                    # Find email
+                    email_response = requests.post(
+                        "https://api.snov.io/v1/get-emails-from-names",
+                        data={
+                            "access_token": token,
+                            "firstName": first_name,
+                            "lastName": last_name,
+                            "domain": domain
+                        }
+                    )
+                    
+                    if email_response.status_code == 200:
+                        data = email_response.json()
+                        emails = data.get("data", {}).get("emails", [])
+                        if emails:
+                            st.success(f"Email found!")
+                            for email in emails:
+                                st.info(f"📧 {email.get('email')} — Confidence: {email.get('emailStatus')}")
+                        else:
+                            st.warning("No email found for this person!")
+                    else:
+                        st.error("Email search failed!")
+                else:
+                    st.error("API authentication failed!")
         else:
-            st.warning("Please fill in the required fields!")
+            st.warning("Please fill First Name and Domain!")
