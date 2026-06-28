@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-
+from dotenv import load_dotenv
 st.set_page_config(
     page_title="LeadHunter",
     page_icon="🎯",
