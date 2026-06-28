@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import os
-
+import streamlit.components.v1 as components
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -90,10 +90,35 @@ if page == "🏠  Dashboard":
         chart_data = pd.DataFrame({"Leads": [800, 1200, 900, 1800, 1400, 1100, 1600]}, index=["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
         st.line_chart(chart_data, color="#2a78d6")
     with col2:
-        st.markdown("<div style='color:#e6edf3; font-weight:500; margin-bottom:8px;'>✅ Email Verification Stats</div>", unsafe_allow_html=True)
-        verify_data = pd.DataFrame({"Count": [8420, 2546, 1252, 726]}, index=["Valid", "Invalid", "Disposable", "Catch-all"])
-        st.bar_chart(verify_data, color="#3fb950")
-
+        components.html("""
+        <div style='background:#161b22; border:1px solid #30363d; border-radius:8px; padding:16px;'>
+            <div style='color:#e6edf3; font-weight:500; margin-bottom:8px; font-family:sans-serif;'>✅ Email Verification Stats</div>
+            <div style='font-size:11px; color:#7d8590; margin-bottom:8px; font-family:sans-serif;'>
+                🟢 Valid 8,420 (67%) &nbsp; 🔴 Invalid 2,546 (17%)<br>
+                🟡 Disposable 1,252 (10%) &nbsp; ⚫ Catch-all 726 (5.8%)
+            </div>
+            <canvas id="donutChart" style="max-height:180px;"></canvas>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+        <script>
+        new Chart(document.getElementById('donutChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Valid', 'Invalid', 'Disposable', 'Catch-all'],
+                datasets: [{
+                    data: [8420, 2546, 1252, 726],
+                    backgroundColor: ['#3fb950', '#f85149', '#d29922', '#7d8590'],
+                    borderWidth: 2,
+                    borderColor: '#161b22'
+                }]
+            },
+            options: {
+                cutout: '65%',
+                plugins: { legend: { display: false } }
+            }
+        });
+        </script>
+        """, height=280)
 elif page == "💼  LinkedIn Leads":
     st.markdown("<h2 style='color:#e6edf3;'>💼 LinkedIn Lead Finder</h2>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
