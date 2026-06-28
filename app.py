@@ -152,6 +152,7 @@ elif page == "▶️  YouTube Leads":
     if st.button("🔍 Search YouTube Channels"):
         if channel_keyword:
             with st.spinner("Searching YouTube..."):
+                import re
                 api_key = os.getenv("YOUTUBE_API_KEY")
                 url = "https://www.googleapis.com/youtube/v3/search"
                 params = {
@@ -169,10 +170,14 @@ elif page == "▶️  YouTube Leads":
                         results = []
                         for ch in channels:
                             snippet = ch.get("snippet", {})
+                            desc = snippet.get("description", "")
+                            emails = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', desc)
+                            channel_id = ch.get("id", {}).get("channelId", "")
                             results.append({
                                 "Channel": snippet.get("channelTitle", ""),
-                                "Description": snippet.get("description", "")[:50] + "...",
-                                "Channel ID": ch.get("id", {}).get("channelId", "")
+                                "Email": emails[0] if emails else "Not found",
+                                "Description": desc[:80] + "..." if len(desc) > 80 else desc,
+                                "YouTube Link": f"https://youtube.com/channel/{channel_id}"
                             })
                         df = pd.DataFrame(results)
                         st.success(f"Found {len(results)} channels!")
