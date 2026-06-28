@@ -148,11 +148,35 @@ if page == "🏠  Dashboard":
         st.line_chart(chart_data, color="#2a78d6")
 
     with col2:
-        st.markdown("<div style='color:#e6edf3; font-weight:500; margin-bottom:8px;'>✅ Email Verification Stats</div>", unsafe_allow_html=True)
-        verify_data = pd.DataFrame({
-            "Count": [8420, 2546, 1252, 726]
-        }, index=["Valid", "Invalid", "Disposable", "Catch-all"])
-        st.bar_chart(verify_data, color="#3fb950")
+    st.markdown("""
+    <div style='background:#161b22; border:1px solid #30363d; border-radius:8px; padding:16px;'>
+        <div style='color:#e6edf3; font-weight:500; margin-bottom:8px;'>✅ Email Verification Stats</div>
+        <div style='font-size:11px; color:#7d8590; margin-bottom:8px;'>
+            🟢 Valid 8,420 (67%) &nbsp; 🔴 Invalid 2,546 (17%)<br>
+            🟡 Disposable 1,252 (10%) &nbsp; ⚫ Catch-all 726 (5.8%)
+        </div>
+        <canvas id="donutChart" width="200" height="200"></canvas>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <script>
+    new Chart(document.getElementById("donutChart"), {
+        type: "doughnut",
+        data: {
+            labels: ["Valid", "Invalid", "Disposable", "Catch-all"],
+            datasets: [{
+                data: [8420, 2546, 1252, 726],
+                backgroundColor: ["#3fb950", "#f85149", "#d29922", "#7d8590"],
+                borderWidth: 2,
+                borderColor: "#161b22"
+            }]
+        },
+        options: {
+            cutout: "65%",
+            plugins: { legend: { display: false } }
+        }
+    });
+    </script>
+    """, unsafe_allow_html=True)
 
 elif page == "💼  LinkedIn Leads":
     st.markdown("<h2 style='color:#e6edf3;'>💼 LinkedIn Lead Finder</h2>", unsafe_allow_html=True)
